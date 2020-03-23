@@ -1,0 +1,31 @@
+service: Bento
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  execute:
+    handler: bentoExecutor/function/executor.execute
+  environment:
+    NEW_VIDEO_BUCKET: ${custom.videouploadbucket}
+    layers:
+      - {Ref: FfmpegLambdaLayer}
+  transcoder:
+    handler: bentoTranscoder/function/transcoder.transcode
+  environment:
+    TRANSCODED_VIDEOS_BUCKET: ${custom.transcodedvideos}
+    layers:
+      - {Ref: FfmpegLambdaLayer}
+
+custom: 
+  videouploadbucket: bento-video-start
+  transcodedvideos: bento-video-transcoded
+  processedvideos: bento-video-end
+
+
+layers:
+  ffmpeg:
+    path: layers/ffmpeg
+  otherLayer:
+    path: layers/otherLayer
